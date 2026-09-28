@@ -1,0 +1,8 @@
+node_modules
+dist
+coverage
+.git
+.harness/output/coverage
+*.log
+Version0.zip
+.persist-probe

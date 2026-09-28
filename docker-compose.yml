@@ -1,0 +1,16 @@
+services:
+  storeops:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: storeops-api:1.0.0
+    container_name: storeops-api
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: "3000"
+      # Seed the demonstration roster and tokens. Set to "false" for an empty
+      # store — the API then rejects every request with 401, because staff is
+      # auth-only and StoreOps issues no credentials of its own.
+      STOREOPS_SEED: "true"
+    restart: unless-stopped

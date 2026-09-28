@@ -1,0 +1,41 @@
+{
+  "name": "storeops-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "StoreOps — Retail Store Operations Management REST API, plus the agentic development harness that governs AI-assisted changes to it. Capstone reference codebase — do not use in production.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node dist/src/main.js",
+    "dev": "npm run build && node dist/src/main.js",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "smoke": "node scripts/smoke.mjs",
+    "check:boundaries": "node .harness/checks/check-boundaries.mjs",
+    "check:errors": "node .harness/checks/check-errors.mjs",
+    "check:tests": "node .harness/checks/check-test-quality.mjs",
+    "check:events": "node .harness/checks/check-events.mjs",
+    "gate": "node .harness/checks/gate.mjs",
+    "gate:full": "node .harness/checks/gate.mjs --with-build",
+    "gate:selftest": "node .harness/checks/selftest.mjs",
+    "harness:verify": "npm run gate:selftest && npm run gate:full"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.5",
+    "@types/supertest": "^6.0.2",
+    "@vitest/coverage-v8": "^2.1.8",
+    "supertest": "^7.0.0",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}

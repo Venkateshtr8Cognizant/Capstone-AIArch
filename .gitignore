@@ -1,0 +1,17 @@
+node_modules/
+dist/
+coverage/
+*.log
+*.tsbuildinfo
+
+# Gate and coverage output is regenerated on every run. The archived copies
+# under .harness/reviews/ are the governance record and ARE committed.
+.harness/output/coverage/
+.harness/output/gate-report.json
+.harness/output/gate-selftest.json
+
+# Local scratch
+Version0.zip
+.persist-probe
+.DS_Store
+Thumbs.db
