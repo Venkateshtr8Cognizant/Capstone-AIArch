@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-ChildItem -Recurse -File -Path src,.harness | ForEach-Object { $_.FullName.Replace\\(\\(Get-Location\\).Path + '\\\\',''\\) })",
+      "PowerShell(npm install --no-audit --no-fund)",
+      "PowerShell(npx tsc -p tsconfig.json --noEmit 2>&1)",
+      "PowerShell(npx vitest run 2>&1)",
+      "PowerShell(npx vitest run --coverage 2>&1)",
+      "PowerShell(node .harness/checks/gate.mjs 2>&1)",
+      "PowerShell(node .harness/checks/selftest.mjs; Write-Output \"exit=$LASTEXITCODE\")",
+      "PowerShell(node scripts/smoke.mjs 2>&1 | Select-Object -Last 70; Write-Output \"exit=$LASTEXITCODE\")",
+      "PowerShell(docker --version 2>&1)"
+    ]
+  }
+}
