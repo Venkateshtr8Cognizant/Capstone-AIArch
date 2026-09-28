@@ -1,0 +1,108 @@
+{
+  "verdict": "PASS",
+  "generatedAt": "2026-09-28T05:06:57.396Z",
+  "summary": {
+    "fixtures": 5,
+    "passed": 5,
+    "failed": 0,
+    "failureModesCovered": [
+      "F1",
+      "F2",
+      "F3",
+      "F4"
+    ]
+  },
+  "cases": [
+    {
+      "fixture": "f0-clean",
+      "failureMode": "control",
+      "description": "clean reference tree: typed errors, public contracts, write-then-publish, real assertions",
+      "expectedRules": [],
+      "firedRules": [],
+      "missingRules": [],
+      "blockingCount": 0,
+      "passed": true
+    },
+    {
+      "fixture": "f1-repository-import",
+      "failureMode": "F1",
+      "description": "activities writes straight into the alerts module's repository",
+      "expectedRules": [
+        "MB-1",
+        "MB-6",
+        "EV-5"
+      ],
+      "firedRules": [
+        "EV-1",
+        "EV-5",
+        "MB-1",
+        "MB-6"
+      ],
+      "missingRules": [],
+      "blockingCount": 9,
+      "passed": true
+    },
+    {
+      "fixture": "f2-raw-error",
+      "failureMode": "F2",
+      "description": "raw Error / RangeError / string throws, empty catch, hand-rolled HTTP error responses",
+      "expectedRules": [
+        "EH-1",
+        "EH-2",
+        "EH-3",
+        "EH-4",
+        "EH-5"
+      ],
+      "firedRules": [
+        "EH-1",
+        "EH-2",
+        "EH-3",
+        "EH-4",
+        "EH-5",
+        "EV-1"
+      ],
+      "missingRules": [],
+      "blockingCount": 8,
+      "passed": true
+    },
+    {
+      "fixture": "f3-status-only-test",
+      "failureMode": "F3",
+      "description": "green tests that assert status codes and nothing about the business rules",
+      "expectedRules": [
+        "TQ-2",
+        "TQ-3",
+        "TQ-4",
+        "TQ-5"
+      ],
+      "firedRules": [
+        "EV-0",
+        "TQ-2",
+        "TQ-3",
+        "TQ-4",
+        "TQ-5"
+      ],
+      "missingRules": [],
+      "blockingCount": 7,
+      "passed": true
+    },
+    {
+      "fixture": "f4-missing-event",
+      "failureMode": "F4",
+      "description": "declared event never published; wrong module publishes; subscriber misplaced and unnamed",
+      "expectedRules": [
+        "EV-1",
+        "EV-2",
+        "EV-3"
+      ],
+      "firedRules": [
+        "EV-1",
+        "EV-2",
+        "EV-3"
+      ],
+      "missingRules": [],
+      "blockingCount": 4,
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,542 @@
+{
+  "verdict": "FAIL",
+  "generatedAt": "2026-09-22T13:39:02.922Z",
+  "rootDir": "C:\\Users\\2096386\\OneDrive - Cognizant\\Documents\\AI-NativeArch\\.harness\\reviews\\2026-09-22-shift-handover-bulk-status\\sprint-2-iteration-1\\rejected-code",
+  "summary": {
+    "checksRun": 4,
+    "blockingCount": 23,
+    "advisoryCount": 0,
+    "buildStepsRun": 0,
+    "buildStepsFailed": 0
+  },
+  "byFailureMode": {
+    "F1": {
+      "description": "Direct imports from another module's repository, bypassing the service boundary and event bus",
+      "blocking": 3,
+      "advisory": 0
+    },
+    "F2": {
+      "description": "Raw Error throws in service methods, bypassing the typed AppError hierarchy",
+      "blocking": 5,
+      "advisory": 0
+    },
+    "F3": {
+      "description": "Tests that assert HTTP status codes without verifying business rule compliance",
+      "blocking": 11,
+      "advisory": 0
+    },
+    "F4": {
+      "description": "Missing event bus integration — state changes written directly to sibling module repositories",
+      "blocking": 4,
+      "advisory": 0
+    }
+  },
+  "checks": [
+    {
+      "check": "boundaries",
+      "description": "module boundaries and service-contract integrity (failure mode F1)",
+      "scannedFileCount": 10,
+      "blocking": 3,
+      "advisory": 0
+    },
+    {
+      "check": "errors",
+      "description": "typed AppError hierarchy and error-response ownership (failure mode F2)",
+      "scannedFileCount": 9,
+      "blocking": 5,
+      "advisory": 0
+    },
+    {
+      "check": "test-quality",
+      "description": "business-rule assertions rather than status-code-only tests (failure mode F3)",
+      "scannedFileCount": 1,
+      "blocking": 11,
+      "advisory": 0
+    },
+    {
+      "check": "events",
+      "description": "event-driven cross-module state changes (failure mode F4)",
+      "scannedFileCount": 9,
+      "blocking": 4,
+      "advisory": 0
+    }
+  ],
+  "findings": [
+    {
+      "severity": "blocking",
+      "rule": "MB-1",
+      "file": "src/modules/activities/activities.service.ts",
+      "line": 9,
+      "message": "Module 'activities' imports the repository of module 'alerts' ('src/modules/alerts/alerts.repository.ts').",
+      "hint": "Import the read port type from 'src/modules/alerts/index.ts' for lookups, or publish an event in src/contracts/events.ts for a state change.",
+      "failureMode": "F1",
+      "check": "boundaries"
+    },
+    {
+      "severity": "blocking",
+      "rule": "MB-1",
+      "file": "src/modules/activities/activities.service.ts",
+      "line": 11,
+      "message": "Module 'activities' imports 'src/modules/alerts/alerts.service.ts', which is private to module 'alerts'.",
+      "hint": "Import the read port type from 'src/modules/alerts/index.ts' for lookups, or publish an event in src/contracts/events.ts for a state change.",
+      "failureMode": "F1",
+      "check": "boundaries"
+    },
+    {
+      "severity": "blocking",
+      "rule": "MB-6",
+      "file": "src/modules/activities/activities.service.ts",
+      "line": 9,
+      "message": "'src/modules/activities/activities.service.ts' names 'InMemoryAlertRepository', the repository port of module 'alerts'.",
+      "hint": "Use the 'alerts' module's public read port for lookups and an event for writes.",
+      "failureMode": "F1",
+      "check": "boundaries"
+    },
+    {
+      "severity": "blocking",
+      "rule": "EH-4",
+      "file": "src/modules/activities/activities.routes.ts",
+      "line": 21,
+      "message": "Route builds a 400 response by hand, bypassing the error middleware.",
+      "hint": "Throw the matching AppError; errorHandler() owns the status, the body shape and the log line.",
+      "failureMode": "F2",
+      "check": "errors"
+    },
+    {
+      "severity": "blocking",
+      "rule": "EH-4",
+      "file": "src/modules/activities/activities.routes.ts",
+      "line": 29,
+      "message": "Route builds a 422 response by hand, bypassing the error middleware.",
+      "hint": "Throw the matching AppError; errorHandler() owns the status, the body shape and the log line.",
+      "failureMode": "F2",
+      "check": "errors"
+    },
+    {
+      "severity": "blocking",
+      "rule": "EH-4",
+      "file": "src/modules/activities/activities.routes.ts",
+      "line": 43,
+      "message": "Route builds a 500 response by hand, bypassing the error middleware.",
+      "hint": "Throw the matching AppError; errorHandler() owns the status, the body shape and the log line.",
+      "failureMode": "F2",
+      "check": "errors"
+    },
+    {
+      "severity": "blocking",
+      "rule": "EH-1",
+      "file": "src/modules/activities/activities.service.ts",
+      "line": 42,
+      "message": "Raw `throw new Error(...)` bypasses the AppError hierarchy: no code, no HTTP mapping, no operational flag.",
+      "hint": "Throw ValidationError (400), AuthenticationError (401), AuthorizationError (403), NotFoundError (404), ConflictError (409), BusinessRuleError (422) or InternalError (500) from src/platform/errors/.",
+      "failureMode": "F2",
+      "check": "errors"
+    },
+    {
+      "severity": "blocking",
+      "rule": "EH-1",
+      "file": "src/modules/activities/activities.service.ts",
+      "line": 45,
+      "message": "Raw `throw new Error(...)` bypasses the AppError hierarchy: no code, no HTTP mapping, no operational flag.",
+      "hint": "Throw ValidationError (400), AuthenticationError (401), AuthorizationError (403), NotFoundError (404), ConflictError (409), BusinessRuleError (422) or InternalError (500) from src/platform/errors/.",
+      "failureMode": "F2",
+      "check": "errors"
+    },
+    {
+      "severity": "blocking",
+      "rule": "TQ-2",
+      "file": "tests/integration/bulk-status.api.test.ts",
+      "line": 12,
+      "message": "Test \"updates activities in bulk\" asserts an HTTP status code but no business outcome.",
+      "hint": "Add an assertion on the response body, the emitted domain event, the typed error code, or the persisted state.",
+      "failureMode": "F3",
+      "check": "test-quality"
+    },
+    {
+      "severity": "blocking",
+      "rule": "TQ-3",
+      "file": "tests/integration/bulk-status.api.test.ts",
+      "line": 27,
+      "message": "Test \"rejects a blocked update with no note\" asserts a 422 without asserting which business rule was violated.",
+      "hint": "Assert response.body.error.rule (or details[].rule) against the rule id in the sprint contract.",
+      "failureMode": "F3",
+      "check": "test-quality"
+    },
+    {
+      "severity": "blocking",
+      "rule": "TQ-2",
+      "file": "tests/integration/bulk-status.api.test.ts",
+      "line": 40,
+      "message": "Test \"requires authentication\" asserts an HTTP status code but no business outcome.",
+      "hint": "Add an assertion on the response body, the emitted domain event, the typed error code, or the persisted state.",
+      "failureMode": "F3",
+      "check": "test-quality"
+    },
+    {
+      "severity": "blocking",
+      "rule": "TQ-7",
+      "file": ".harness/output/active-rules.json",
+      "line": 1,
+      "message": "Business rule 'BR-1' from the active sprint contract is not asserted by any test.",
+      "hint": "Add a test that provokes BR-1 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+      "failureMode": "F3",
+      "check": "test-quality"
+    },
+    {
+      "severity": "blocking",
+      "rule": "TQ-7",
+      "file": ".harness/output/active-rules.json",
+      "line": 1,
+      "message": "Business rule 'BR-3' from the active sprint contract is not asserted by any test.",
+      "hint": "Add a test that provokes BR-3 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+      "failureMode": "F3",
+      "check": "test-quality"
+    },
+    {
+      "severity": "blocking",
+      "rule": "TQ-7",
+      "file": ".harness/output/active-rules.json",
+      "line": 1,
+      "message": "Business rule 'BR-4' from the active sprint contract is not asserted by any test.",
+      "hint": "Add a test that provokes BR-4 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+      "failureMode": "F3",
+      "check": "test-quality"
+    },
+    {
+      "severity": "blocking",
+      "rule": "TQ-7",
+      "file": ".harness/output/active-rules.json",
+      "line": 1,
+      "message": "Business rule 'BR-5' from the active sprint contract is not asserted by any test.",
+      "hint": "Add a test that provokes BR-5 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+      "failureMode": "F3",
+      "check": "test-quality"
+    },
+    {
+      "severity": "blocking",
+      "rule": "TQ-7",
+      "file": ".harness/output/active-rules.json",
+      "line": 1,
+      "message": "Business rule 'BR-7' from the active sprint contract is not asserted by any test.",
+      "hint": "Add a test that provokes BR-7 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+      "failureMode": "F3",
+      "check": "test-quality"
+    },
+    {
+      "severity": "blocking",
+      "rule": "TQ-7",
+      "file": ".harness/output/active-rules.json",
+      "line": 1,
+      "message": "Business rule 'BR-9' from the active sprint contract is not asserted by any test.",
+      "hint": "Add a test that provokes BR-9 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+      "failureMode": "F3",
+      "check": "test-quality"
+    },
+    {
+      "severity": "blocking",
+      "rule": "TQ-7",
+      "file": ".harness/output/active-rules.json",
+      "line": 1,
+      "message": "Business rule 'BR-10' from the active sprint contract is not asserted by any test.",
+      "hint": "Add a test that provokes BR-10 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+      "failureMode": "F3",
+      "check": "test-quality"
+    },
+    {
+      "severity": "blocking",
+      "rule": "TQ-7",
+      "file": ".harness/output/active-rules.json",
+      "line": 1,
+      "message": "Business rule 'BR-11' from the active sprint contract is not asserted by any test.",
+      "hint": "Add a test that provokes BR-11 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+      "failureMode": "F3",
+      "check": "test-quality"
+    },
+    {
+      "severity": "blocking",
+      "rule": "EV-5",
+      "file": "src/modules/activities/activities.service.ts",
+      "line": 9,
+      "message": "Module 'activities' imports the implementation of 'alerts' ('src/modules/alerts/alerts.repository.ts') directly.",
+      "hint": "Depend on the 'alerts' read port TYPE from its index.ts for lookups; use an event for side effects.",
+      "failureMode": "F4",
+      "check": "events"
+    },
+    {
+      "severity": "blocking",
+      "rule": "EV-5",
+      "file": "src/modules/activities/activities.service.ts",
+      "line": 11,
+      "message": "Module 'activities' imports the implementation of 'alerts' ('src/modules/alerts/alerts.service.ts') directly.",
+      "hint": "Depend on the 'alerts' read port TYPE from its index.ts for lookups; use an event for side effects.",
+      "failureMode": "F4",
+      "check": "events"
+    },
+    {
+      "severity": "blocking",
+      "rule": "EV-1",
+      "file": "src/contracts/events.ts",
+      "line": 1,
+      "message": "Event 'activities.bulk_status.completed' is declared but never published by module 'activities'.",
+      "hint": "Publish it from the activities service method that performs the state change, or remove it from the catalogue.",
+      "failureMode": "F4",
+      "check": "events"
+    },
+    {
+      "severity": "blocking",
+      "rule": "EV-1",
+      "file": "src/contracts/events.ts",
+      "line": 1,
+      "message": "Event 'alerts.notification.created' is declared but never published by module 'alerts'.",
+      "hint": "Publish it from the alerts service method that performs the state change, or remove it from the catalogue.",
+      "failureMode": "F4",
+      "check": "events"
+    }
+  ],
+  "buildSteps": [],
+  "eventInventory": {
+    "publishers": {},
+    "subscribers": {}
+  },
+  "results": [
+    {
+      "check": "boundaries",
+      "description": "module boundaries and service-contract integrity (failure mode F1)",
+      "scannedFileCount": 10,
+      "findings": [
+        {
+          "severity": "blocking",
+          "rule": "MB-1",
+          "file": "src/modules/activities/activities.service.ts",
+          "line": 9,
+          "message": "Module 'activities' imports the repository of module 'alerts' ('src/modules/alerts/alerts.repository.ts').",
+          "hint": "Import the read port type from 'src/modules/alerts/index.ts' for lookups, or publish an event in src/contracts/events.ts for a state change.",
+          "failureMode": "F1"
+        },
+        {
+          "severity": "blocking",
+          "rule": "MB-1",
+          "file": "src/modules/activities/activities.service.ts",
+          "line": 11,
+          "message": "Module 'activities' imports 'src/modules/alerts/alerts.service.ts', which is private to module 'alerts'.",
+          "hint": "Import the read port type from 'src/modules/alerts/index.ts' for lookups, or publish an event in src/contracts/events.ts for a state change.",
+          "failureMode": "F1"
+        },
+        {
+          "severity": "blocking",
+          "rule": "MB-6",
+          "file": "src/modules/activities/activities.service.ts",
+          "line": 9,
+          "message": "'src/modules/activities/activities.service.ts' names 'InMemoryAlertRepository', the repository port of module 'alerts'.",
+          "hint": "Use the 'alerts' module's public read port for lookups and an event for writes.",
+          "failureMode": "F1"
+        }
+      ]
+    },
+    {
+      "check": "errors",
+      "description": "typed AppError hierarchy and error-response ownership (failure mode F2)",
+      "scannedFileCount": 9,
+      "findings": [
+        {
+          "severity": "blocking",
+          "rule": "EH-4",
+          "file": "src/modules/activities/activities.routes.ts",
+          "line": 21,
+          "message": "Route builds a 400 response by hand, bypassing the error middleware.",
+          "hint": "Throw the matching AppError; errorHandler() owns the status, the body shape and the log line.",
+          "failureMode": "F2"
+        },
+        {
+          "severity": "blocking",
+          "rule": "EH-4",
+          "file": "src/modules/activities/activities.routes.ts",
+          "line": 29,
+          "message": "Route builds a 422 response by hand, bypassing the error middleware.",
+          "hint": "Throw the matching AppError; errorHandler() owns the status, the body shape and the log line.",
+          "failureMode": "F2"
+        },
+        {
+          "severity": "blocking",
+          "rule": "EH-4",
+          "file": "src/modules/activities/activities.routes.ts",
+          "line": 43,
+          "message": "Route builds a 500 response by hand, bypassing the error middleware.",
+          "hint": "Throw the matching AppError; errorHandler() owns the status, the body shape and the log line.",
+          "failureMode": "F2"
+        },
+        {
+          "severity": "blocking",
+          "rule": "EH-1",
+          "file": "src/modules/activities/activities.service.ts",
+          "line": 42,
+          "message": "Raw `throw new Error(...)` bypasses the AppError hierarchy: no code, no HTTP mapping, no operational flag.",
+          "hint": "Throw ValidationError (400), AuthenticationError (401), AuthorizationError (403), NotFoundError (404), ConflictError (409), BusinessRuleError (422) or InternalError (500) from src/platform/errors/.",
+          "failureMode": "F2"
+        },
+        {
+          "severity": "blocking",
+          "rule": "EH-1",
+          "file": "src/modules/activities/activities.service.ts",
+          "line": 45,
+          "message": "Raw `throw new Error(...)` bypasses the AppError hierarchy: no code, no HTTP mapping, no operational flag.",
+          "hint": "Throw ValidationError (400), AuthenticationError (401), AuthorizationError (403), NotFoundError (404), ConflictError (409), BusinessRuleError (422) or InternalError (500) from src/platform/errors/.",
+          "failureMode": "F2"
+        }
+      ]
+    },
+    {
+      "check": "test-quality",
+      "description": "business-rule assertions rather than status-code-only tests (failure mode F3)",
+      "scannedFileCount": 1,
+      "findings": [
+        {
+          "severity": "blocking",
+          "rule": "TQ-2",
+          "file": "tests/integration/bulk-status.api.test.ts",
+          "line": 12,
+          "message": "Test \"updates activities in bulk\" asserts an HTTP status code but no business outcome.",
+          "hint": "Add an assertion on the response body, the emitted domain event, the typed error code, or the persisted state.",
+          "failureMode": "F3"
+        },
+        {
+          "severity": "blocking",
+          "rule": "TQ-3",
+          "file": "tests/integration/bulk-status.api.test.ts",
+          "line": 27,
+          "message": "Test \"rejects a blocked update with no note\" asserts a 422 without asserting which business rule was violated.",
+          "hint": "Assert response.body.error.rule (or details[].rule) against the rule id in the sprint contract.",
+          "failureMode": "F3"
+        },
+        {
+          "severity": "blocking",
+          "rule": "TQ-2",
+          "file": "tests/integration/bulk-status.api.test.ts",
+          "line": 40,
+          "message": "Test \"requires authentication\" asserts an HTTP status code but no business outcome.",
+          "hint": "Add an assertion on the response body, the emitted domain event, the typed error code, or the persisted state.",
+          "failureMode": "F3"
+        },
+        {
+          "severity": "blocking",
+          "rule": "TQ-7",
+          "file": ".harness/output/active-rules.json",
+          "line": 1,
+          "message": "Business rule 'BR-1' from the active sprint contract is not asserted by any test.",
+          "hint": "Add a test that provokes BR-1 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+          "failureMode": "F3"
+        },
+        {
+          "severity": "blocking",
+          "rule": "TQ-7",
+          "file": ".harness/output/active-rules.json",
+          "line": 1,
+          "message": "Business rule 'BR-3' from the active sprint contract is not asserted by any test.",
+          "hint": "Add a test that provokes BR-3 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+          "failureMode": "F3"
+        },
+        {
+          "severity": "blocking",
+          "rule": "TQ-7",
+          "file": ".harness/output/active-rules.json",
+          "line": 1,
+          "message": "Business rule 'BR-4' from the active sprint contract is not asserted by any test.",
+          "hint": "Add a test that provokes BR-4 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+          "failureMode": "F3"
+        },
+        {
+          "severity": "blocking",
+          "rule": "TQ-7",
+          "file": ".harness/output/active-rules.json",
+          "line": 1,
+          "message": "Business rule 'BR-5' from the active sprint contract is not asserted by any test.",
+          "hint": "Add a test that provokes BR-5 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+          "failureMode": "F3"
+        },
+        {
+          "severity": "blocking",
+          "rule": "TQ-7",
+          "file": ".harness/output/active-rules.json",
+          "line": 1,
+          "message": "Business rule 'BR-7' from the active sprint contract is not asserted by any test.",
+          "hint": "Add a test that provokes BR-7 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+          "failureMode": "F3"
+        },
+        {
+          "severity": "blocking",
+          "rule": "TQ-7",
+          "file": ".harness/output/active-rules.json",
+          "line": 1,
+          "message": "Business rule 'BR-9' from the active sprint contract is not asserted by any test.",
+          "hint": "Add a test that provokes BR-9 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+          "failureMode": "F3"
+        },
+        {
+          "severity": "blocking",
+          "rule": "TQ-7",
+          "file": ".harness/output/active-rules.json",
+          "line": 1,
+          "message": "Business rule 'BR-10' from the active sprint contract is not asserted by any test.",
+          "hint": "Add a test that provokes BR-10 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+          "failureMode": "F3"
+        },
+        {
+          "severity": "blocking",
+          "rule": "TQ-7",
+          "file": ".harness/output/active-rules.json",
+          "line": 1,
+          "message": "Business rule 'BR-11' from the active sprint contract is not asserted by any test.",
+          "hint": "Add a test that provokes BR-11 and asserts on the rule id, or remove it from the contract if it is out of scope.",
+          "failureMode": "F3"
+        }
+      ]
+    },
+    {
+      "check": "events",
+      "description": "event-driven cross-module state changes (failure mode F4)",
+      "scannedFileCount": 9,
+      "findings": [
+        {
+          "severity": "blocking",
+          "rule": "EV-5",
+          "file": "src/modules/activities/activities.service.ts",
+          "line": 9,
+          "message": "Module 'activities' imports the implementation of 'alerts' ('src/modules/alerts/alerts.repository.ts') directly.",
+          "hint": "Depend on the 'alerts' read port TYPE from its index.ts for lookups; use an event for side effects.",
+          "failureMode": "F4"
+        },
+        {
+          "severity": "blocking",
+          "rule": "EV-5",
+          "file": "src/modules/activities/activities.service.ts",
+          "line": 11,
+          "message": "Module 'activities' imports the implementation of 'alerts' ('src/modules/alerts/alerts.service.ts') directly.",
+          "hint": "Depend on the 'alerts' read port TYPE from its index.ts for lookups; use an event for side effects.",
+          "failureMode": "F4"
+        },
+        {
+          "severity": "blocking",
+          "rule": "EV-1",
+          "file": "src/contracts/events.ts",
+          "line": 1,
+          "message": "Event 'activities.bulk_status.completed' is declared but never published by module 'activities'.",
+          "hint": "Publish it from the activities service method that performs the state change, or remove it from the catalogue.",
+          "failureMode": "F4"
+        },
+        {
+          "severity": "blocking",
+          "rule": "EV-1",
+          "file": "src/contracts/events.ts",
+          "line": 1,
+          "message": "Event 'alerts.notification.created' is declared but never published by module 'alerts'.",
+          "hint": "Publish it from the alerts service method that performs the state change, or remove it from the catalogue.",
+          "failureMode": "F4"
+        }
+      ],
+      "inventory": {
+        "publishers": {},
+        "subscribers": {}
+      }
+    }
+  ]
+}

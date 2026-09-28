@@ -1,0 +1,73 @@
+﻿=== StoreOps smoke test ===
+
+Building…
+
+Starting server on :3100…
+
+--- health and authentication ---
+  ok   GET /health returns 200 ok
+  ok   GET /api/activities without a token returns 401 NOT_AUTHENTICATED
+  ok   an unknown token returns 401
+
+--- seed: three activities on the early shift ---
+  seeded: task_0e5e440b-5cc1-4a1d-b9dd-211dfbfeec2e, task_1b7745ed-6021-47ed-88de-709fd11a321e, task_c19e39aa-0a56-4077-bf2e-cbf6895c0b8e
+
+--- shift handover: bulk status update (partial failure) ---
+  ok   returns 200
+  ok   updated the two activities the caller is assigned
+  ok   every updated activity is DONE
+  ok   rejected the chilled activity with NOT_PERMITTED / BR-7
+  ok   rejected the unknown id with ACTIVITY_NOT_FOUND / BR-4
+  ok   echoes the caller correlation id
+  ok   the rejected activity is untouched in the store
+  ok   two activities now list as DONE
+
+--- cross-module effect: SHIFT_HANDOVER alert via the event bus ---
+  ok   the store manager has one notification
+  ok   it is a SHIFT_HANDOVER, IN_APP, PENDING
+  ok   its subject names the count and the target status
+  ok   it carries the originating correlation id
+  ok   an unrelated colleague sees no notifications
+
+--- business rule rejections ---
+  ok   BLOCKED with no note returns 422
+  ok   …naming rule BR-3
+  ok   …with the offending field
+  ok   the same request with a note succeeds
+  ok   the activity is BLOCKED
+  ok   KNOWN GAP F-5: a HIGH activity blocked in bulk raises no ESCALATION (bulk path emits no status_changed)
+  ok   duplicate ids return 422 naming BR-1
+  ok   a batch where nothing can change returns 422 naming BR-9
+  ok   …and reports the per-item reason BR-6
+  ok   a 51-item batch returns 400 VALIDATION_FAILED on taskIds
+
+--- cross-module effect: programme close triggers a report recompute ---
+  ok   created a programme in PLANNING
+  ok   closing it returns 200 CLOSED
+  ok   a department lead cannot close a programme (409 already closed or 403)
+
+--- server log — structured, correlated ---
+  ok   logged the bulk completion
+  ok   logged the alert being raised
+  ok   logged the report becoming ready
+  ok   log lines carry the correlation id
+
+=== sample server log lines ===
+{"level":"warn","event":"request.rejected","ts":"2026-09-22T13:51:15.348Z","code":"NOT_AUTHENTICATED","status":401,"method":"GET","path":"/api/activities","userId":null,"correlationId":"91ada353-6aa0-48e7-89ea-ddfe956f3cd0"}
+{"level":"warn","event":"request.rejected","ts":"2026-09-22T13:51:15.354Z","code":"NOT_AUTHENTICATED","status":401,"method":"GET","path":"/api/activities","userId":null,"correlationId":"798a2c73-0cff-4feb-a6f6-b9103b5c1254"}
+{"level":"info","event":"alerts.notification_raised","ts":"2026-09-22T13:51:15.419Z","notificationId":"notif_d3441c0b-0c30-4f92-9452-6da32cd49a15","type":"SHIFT_HANDOVER","channel":"IN_APP","userId":"user_sam","correlationId":"smoke-handover-1"}
+{"level":"info","event":"reports.report_requested","ts":"2026-09-22T13:51:15.420Z","reportId":"rep_5746a752-aba6-47af-b00a-d055f88790eb","type":"STORE_SUMMARY","scopeId":"store_401","reason":"bulk_status_completed","correlationId":"smoke-handover-1"}
+{"level":"info","event":"reports.store_summary_ready","ts":"2026-09-22T13:51:15.435Z","reportId":"rep_5746a752-aba6-47af-b00a-d055f88790eb","storeId":"store_401","programmeCount":0,"totalActivities":3,"completionRate":0.667,"correlationId":"smoke-handover-1"}
+{"level":"info","event":"activities.bulk_status_completed","ts":"2026-09-22T13:51:15.435Z","bulkOperationId":"bulk_bb9774db-718e-41f7-9d84-d2f56e03525a","targetStatus":"DONE","updatedCount":2,"failedCount":2,"userId":"user_alice","correlationId":"smoke-handover-1"}
+{"level":"warn","event":"request.rejected","ts":"2026-09-22T13:51:15.459Z","code":"BUSINESS_RULE_VIOLATION","status":422,"method":"PATCH","path":"/api/activities/bulk-status","userId":"user_marcus","correlationId":"9b7ef8b6-4ff0-4386-9f4d-d5520f821ecd"}
+{"level":"info","event":"alerts.notification_raised","ts":"2026-09-22T13:51:15.462Z","notificationId":"notif_75d3d850-5d4d-44f9-93ab-6a56ac410d52","type":"SHIFT_HANDOVER","channel":"IN_APP","userId":"user_sam","correlationId":"592c5505-e974-40ad-bd01-e46797d57554"}
+{"level":"info","event":"reports.report_requested","ts":"2026-09-22T13:51:15.462Z","reportId":"rep_30a9e794-6706-408b-a3d0-4b905d1ee252","type":"STORE_SUMMARY","scopeId":"store_401","reason":"bulk_status_completed","correlationId":"592c5505-e974-40ad-bd01-e46797d57554"}
+{"level":"info","event":"reports.store_summary_ready","ts":"2026-09-22T13:51:15.462Z","reportId":"rep_30a9e794-6706-408b-a3d0-4b905d1ee252","storeId":"store_401","programmeCount":0,"totalActivities":3,"completionRate":0.667,"correlationId":"592c5505-e974-40ad-bd01-e46797d57554"}
+{"level":"info","event":"activities.bulk_status_completed","ts":"2026-09-22T13:51:15.462Z","bulkOperationId":"bulk_7e8da0ab-31a9-4e34-b82d-c4c719993dbd","targetStatus":"BLOCKED","updatedCount":1,"failedCount":0,"userId":"user_marcus","correlationId":"592c5505-e974-40ad-bd01-e46797d57554"}
+{"level":"warn","event":"request.rejected","ts":"2026-09-22T13:51:15.468Z","code":"BUSINESS_RULE_VIOLATION","status":422,"method":"PATCH","path":"/api/activities/bulk-status","userId":"user_priya","correlationId":"9562f985-91bb-46b3-9ea2-712b8a89aca9"}
+{"level":"warn","event":"request.rejected","ts":"2026-09-22T13:51:15.472Z","code":"BUSINESS_RULE_VIOLATION","status":422,"method":"PATCH","path":"/api/activities/bulk-status","userId":"user_priya","correlationId":"d3b1fafe-1a7c-4a88-a828-acb7057521fd"}
+{"level":"warn","event":"request.rejected","ts":"2026-09-22T13:51:15.478Z","code":"VALIDATION_FAILED","status":400,"method":"PATCH","path":"/api/activities/bulk-status","userId":"user_priya","correlationId":"9ca1526d-bda0-4322-9d3b-76680d58e28e"}
+{"level":"info","event":"reports.store_summary_ready","ts":"2026-09-22T13:51:15.487Z","reportId":"rep_587a9f1d-63fc-4e05-a61a-6184cb5453f7","storeId":"store_401","programmeCount":1,"totalActivities":3,"completionRate":0.667,"correlationId":"b16ce643-0b84-45d2-aef6-d7f8c4acab38"}
+{"level":"warn","event":"request.rejected","ts":"2026-09-22T13:51:15.490Z","code":"STATE_CONFLICT","status":409,"method":"POST","path":"/api/programmes/prog_faed2c30-2527-457f-bce4-18af286b1e80/close","userId":"user_priya","correlationId":"48db7209-37c3-4fa2-ac52-4f0eaab76c7b"}
+
+=== SMOKE PASS: 33/33 checks ===

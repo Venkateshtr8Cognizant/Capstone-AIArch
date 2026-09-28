@@ -1,0 +1,14 @@
+{
+  "feature": "shift-handover-bulk-status",
+  "sprint": 2,
+  "rules": [
+    { "id": "BR-1", "summary": "batch bounds re-verified through HTTP (400 schema, 422 duplicates)" },
+    { "id": "BR-3", "summary": "BLOCKED without a note returns 422 with rule BR-3" },
+    { "id": "BR-4", "summary": "missing item reported in failed[] with ACTIVITY_NOT_FOUND" },
+    { "id": "BR-5", "summary": "cross-store item refused for every role" },
+    { "id": "BR-7", "summary": "unpermitted item reported in failed[] with NOT_PERMITTED" },
+    { "id": "BR-9", "summary": "all-failed batch returns 422 naming BR-9" },
+    { "id": "BR-10", "summary": "exactly one activities.bulk_status.completed published after the write" },
+    { "id": "BR-11", "summary": "alerts and reports state changed only by their own subscribers" }
+  ]
+}

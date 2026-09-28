@@ -1,0 +1,15 @@
+{
+  "feature": "shift-handover-bulk-status",
+  "sprint": 1,
+  "rules": [
+    { "id": "BR-1", "summary": "batch of 1..50 ids, no duplicates" },
+    { "id": "BR-2", "summary": "targetStatus restricted to DONE or BLOCKED" },
+    { "id": "BR-3", "summary": "BLOCKED requires a non-empty note" },
+    { "id": "BR-4", "summary": "item must exist (ACTIVITY_NOT_FOUND)" },
+    { "id": "BR-5", "summary": "item must belong to the caller's store (CROSS_STORE_FORBIDDEN)" },
+    { "id": "BR-6", "summary": "transition must be legal from current status (ILLEGAL_TRANSITION)" },
+    { "id": "BR-7", "summary": "caller must be assignee, department lead, or store/regional manager (NOT_PERMITTED)" },
+    { "id": "BR-8", "summary": "audit entry appended per updated activity" },
+    { "id": "BR-9", "summary": "nothing updatable rejects the whole request" }
+  ]
+}

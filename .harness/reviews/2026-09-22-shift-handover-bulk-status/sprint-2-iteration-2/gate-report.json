@@ -1,0 +1,259 @@
+{
+  "verdict": "PASS",
+  "generatedAt": "2026-09-22T13:40:27.573Z",
+  "rootDir": "C:\\Users\\2096386\\OneDrive - Cognizant\\Documents\\AI-NativeArch",
+  "summary": {
+    "checksRun": 4,
+    "blockingCount": 0,
+    "advisoryCount": 4,
+    "buildStepsRun": 2,
+    "buildStepsFailed": 0
+  },
+  "byFailureMode": {
+    "F1": {
+      "description": "Direct imports from another module's repository, bypassing the service boundary and event bus",
+      "blocking": 0,
+      "advisory": 0
+    },
+    "F2": {
+      "description": "Raw Error throws in service methods, bypassing the typed AppError hierarchy",
+      "blocking": 0,
+      "advisory": 0
+    },
+    "F3": {
+      "description": "Tests that assert HTTP status codes without verifying business rule compliance",
+      "blocking": 0,
+      "advisory": 0
+    },
+    "F4": {
+      "description": "Missing event bus integration — state changes written directly to sibling module repositories",
+      "blocking": 0,
+      "advisory": 4
+    }
+  },
+  "checks": [
+    {
+      "check": "boundaries",
+      "description": "module boundaries and service-contract integrity (failure mode F1)",
+      "scannedFileCount": 44,
+      "blocking": 0,
+      "advisory": 0
+    },
+    {
+      "check": "errors",
+      "description": "typed AppError hierarchy and error-response ownership (failure mode F2)",
+      "scannedFileCount": 38,
+      "blocking": 0,
+      "advisory": 0
+    },
+    {
+      "check": "test-quality",
+      "description": "business-rule assertions rather than status-code-only tests (failure mode F3)",
+      "scannedFileCount": 5,
+      "blocking": 0,
+      "advisory": 0
+    },
+    {
+      "check": "events",
+      "description": "event-driven cross-module state changes (failure mode F4)",
+      "scannedFileCount": 38,
+      "blocking": 0,
+      "advisory": 4
+    }
+  ],
+  "findings": [
+    {
+      "severity": "advisory",
+      "rule": "EV-6",
+      "file": "src/contracts/events.ts",
+      "line": 1,
+      "message": "Event 'activities.task.created' has no in-process subscriber.",
+      "hint": "Expected when the consumer is downstream (analytics, export). Raise it with the Monitor if a sibling module was supposed to react.",
+      "failureMode": "F4",
+      "check": "events"
+    },
+    {
+      "severity": "advisory",
+      "rule": "EV-6",
+      "file": "src/contracts/events.ts",
+      "line": 1,
+      "message": "Event 'programmes.member.added' has no in-process subscriber.",
+      "hint": "Expected when the consumer is downstream (analytics, export). Raise it with the Monitor if a sibling module was supposed to react.",
+      "failureMode": "F4",
+      "check": "events"
+    },
+    {
+      "severity": "advisory",
+      "rule": "EV-6",
+      "file": "src/contracts/events.ts",
+      "line": 1,
+      "message": "Event 'alerts.notification.created' has no in-process subscriber.",
+      "hint": "Expected when the consumer is downstream (analytics, export). Raise it with the Monitor if a sibling module was supposed to react.",
+      "failureMode": "F4",
+      "check": "events"
+    },
+    {
+      "severity": "advisory",
+      "rule": "EV-6",
+      "file": "src/contracts/events.ts",
+      "line": 1,
+      "message": "Event 'reports.report.requested' has no in-process subscriber.",
+      "hint": "Expected when the consumer is downstream (analytics, export). Raise it with the Monitor if a sibling module was supposed to react.",
+      "failureMode": "F4",
+      "check": "events"
+    }
+  ],
+  "buildSteps": [
+    {
+      "name": "typecheck",
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 11472,
+      "tail": ""
+    },
+    {
+      "name": "tests+coverage",
+      "passed": true,
+      "exitCode": 0,
+      "durationMs": 21720,
+      "tail": " ✓ tests/integration/bulk-status.api.test.ts (11 tests) 335ms\n ✓ tests/integration/base-api.test.ts (22 tests) 482ms\n\n Test Files  5 passed (5)\n      Tests  89 passed (89)\n   Start at  19:10:14\n   Duration  11.37s (transform 987ms, setup 0ms, collect 6.84s, tests 976ms, environment 3ms, prepare 2.70s)\n\n % Coverage report from v8\n\n=============================== Coverage summary ===============================\nStatements   : 92.22% ( 1648/1787 )\nBranches     : 85.49% ( 336/393 )\nFunctions    : 88.4% ( 122/138 )\nLines        : 92.22% ( 1648/1787 )\n================================================================================"
+    }
+  ],
+  "eventInventory": {
+    "publishers": {
+      "activities.task.created": [
+        "src/modules/activities/activities.service.ts:150"
+      ],
+      "activities.task.status_changed": [
+        "src/modules/activities/activities.service.ts:250"
+      ],
+      "activities.bulk_status.completed": [
+        "src/modules/activities/activities.service.ts:373"
+      ],
+      "alerts.notification.created": [
+        "src/modules/alerts/alerts.service.ts:77"
+      ],
+      "programmes.member.added": [
+        "src/modules/programmes/programmes.service.ts:135"
+      ],
+      "programmes.programme.closed": [
+        "src/modules/programmes/programmes.service.ts:186"
+      ],
+      "reports.report.requested": [
+        "src/modules/reports/reports.service.ts:72"
+      ]
+    },
+    "subscribers": {
+      "activities.task.status_changed": [
+        "src/modules/alerts/alerts.subscribers.ts:29"
+      ],
+      "activities.bulk_status.completed": [
+        "src/modules/alerts/alerts.subscribers.ts:65",
+        "src/modules/reports/reports.subscribers.ts:46"
+      ],
+      "programmes.programme.closed": [
+        "src/modules/reports/reports.subscribers.ts:18"
+      ]
+    }
+  },
+  "results": [
+    {
+      "check": "boundaries",
+      "description": "module boundaries and service-contract integrity (failure mode F1)",
+      "scannedFileCount": 44,
+      "findings": []
+    },
+    {
+      "check": "errors",
+      "description": "typed AppError hierarchy and error-response ownership (failure mode F2)",
+      "scannedFileCount": 38,
+      "findings": []
+    },
+    {
+      "check": "test-quality",
+      "description": "business-rule assertions rather than status-code-only tests (failure mode F3)",
+      "scannedFileCount": 5,
+      "findings": []
+    },
+    {
+      "check": "events",
+      "description": "event-driven cross-module state changes (failure mode F4)",
+      "scannedFileCount": 38,
+      "findings": [
+        {
+          "severity": "advisory",
+          "rule": "EV-6",
+          "file": "src/contracts/events.ts",
+          "line": 1,
+          "message": "Event 'activities.task.created' has no in-process subscriber.",
+          "hint": "Expected when the consumer is downstream (analytics, export). Raise it with the Monitor if a sibling module was supposed to react.",
+          "failureMode": "F4"
+        },
+        {
+          "severity": "advisory",
+          "rule": "EV-6",
+          "file": "src/contracts/events.ts",
+          "line": 1,
+          "message": "Event 'programmes.member.added' has no in-process subscriber.",
+          "hint": "Expected when the consumer is downstream (analytics, export). Raise it with the Monitor if a sibling module was supposed to react.",
+          "failureMode": "F4"
+        },
+        {
+          "severity": "advisory",
+          "rule": "EV-6",
+          "file": "src/contracts/events.ts",
+          "line": 1,
+          "message": "Event 'alerts.notification.created' has no in-process subscriber.",
+          "hint": "Expected when the consumer is downstream (analytics, export). Raise it with the Monitor if a sibling module was supposed to react.",
+          "failureMode": "F4"
+        },
+        {
+          "severity": "advisory",
+          "rule": "EV-6",
+          "file": "src/contracts/events.ts",
+          "line": 1,
+          "message": "Event 'reports.report.requested' has no in-process subscriber.",
+          "hint": "Expected when the consumer is downstream (analytics, export). Raise it with the Monitor if a sibling module was supposed to react.",
+          "failureMode": "F4"
+        }
+      ],
+      "inventory": {
+        "publishers": {
+          "activities.task.created": [
+            "src/modules/activities/activities.service.ts:150"
+          ],
+          "activities.task.status_changed": [
+            "src/modules/activities/activities.service.ts:250"
+          ],
+          "activities.bulk_status.completed": [
+            "src/modules/activities/activities.service.ts:373"
+          ],
+          "alerts.notification.created": [
+            "src/modules/alerts/alerts.service.ts:77"
+          ],
+          "programmes.member.added": [
+            "src/modules/programmes/programmes.service.ts:135"
+          ],
+          "programmes.programme.closed": [
+            "src/modules/programmes/programmes.service.ts:186"
+          ],
+          "reports.report.requested": [
+            "src/modules/reports/reports.service.ts:72"
+          ]
+        },
+        "subscribers": {
+          "activities.task.status_changed": [
+            "src/modules/alerts/alerts.subscribers.ts:29"
+          ],
+          "activities.bulk_status.completed": [
+            "src/modules/alerts/alerts.subscribers.ts:65",
+            "src/modules/reports/reports.subscribers.ts:46"
+          ],
+          "programmes.programme.closed": [
+            "src/modules/reports/reports.subscribers.ts:18"
+          ]
+        }
+      }
+    }
+  ]
+}
